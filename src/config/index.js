@@ -2,6 +2,7 @@ const path = require("path");
 const dotenv = require('dotenv');
 
 const dbConfig = require(path.join(__dirname, 'config'));
+const text = require(path.join(__dirname, 'language'));
 const bot = require(path.join(__dirname, 'bot'));
 
 // Determine the current environment, defaulting to 'default'
@@ -29,7 +30,8 @@ const generalConfig = {
     development: bot.development,
     test: bot.test,
     production: bot.production
-  }
+  },
+  text: text.en
 };
 
 /**
