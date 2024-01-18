@@ -132,7 +132,7 @@ const text = {
         "Clear the list: /clear\n" +
         "This menu: /help",
       es: "Añadir un ítem: /agregar huevos, leche, crema\n" +
-        "Eliminar un ítem: /eliminar huevos, leche\n" +
+        "Eliminar un ítem: /quitar huevos, leche\n" +
         "Mostrar la lista: /lista\n" +
         "Eliminar la lista: /limpiar\n" +
         "Este menú: /help"
