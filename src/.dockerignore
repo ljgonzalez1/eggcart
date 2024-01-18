@@ -1,16 +1,12 @@
-# Ignorar directorios de control de versiones
 .git
 
-# Ignorar directorios de dependencias
 node_modules
 bower_components
 
-# Ignorar archivos de configuración del editor y del sistema operativo
 .idea
 .DS_Store
 *.sublime*
 
-# Ignorar archivos de registro y archivos temporales
 logs
 *.log
 npm-debug.log*
@@ -21,13 +17,14 @@ yarn-error.log*
 .cache
 *.tgz
 
-# Ignorar directorios de salida y de prueba
 coverage
 .nyc_output
 out
 *.tsbuildinfo
 
-# Otros archivos y directorios a ignorar
 docker
 Dockerfile
 docker-compose.yml
+
+
+*.env
