@@ -25,6 +25,3 @@ out
 docker
 Dockerfile
 docker-compose.yml
-
-
-*.env
