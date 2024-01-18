@@ -315,7 +315,7 @@ class EggCart {
             const messageText = ctx.update.message.text;
             const chatType = ctx.update.message.chat.type;
             
-            if (messageText.includes(`@${this.botName}`) || chatType === 'private' || chatType === 'group') {
+            if (messageText.includes(`@${this.botName}`) || chatType === 'private' || chatType === 'group' || chatType === 'supergroup') {
                 let itemsToAdd = messageText.slice(messageText.indexOf(" ") + 1).split(",");
                 let response = text.methodAddItem.ok.es;
                 
@@ -346,7 +346,7 @@ class EggCart {
             const messageText = ctx.update.message.text;
             const chatType = ctx.update.message.chat.type;
             
-            if (messageText.includes(`@${this.botName}`) || chatType === 'private' || chatType === 'group') {
+            if (messageText.includes(`@${this.botName}`) || chatType === 'private' || chatType === 'group' || chatType === 'supergroup') {
                 let itemsToRemove = messageText.slice(messageText.indexOf(" ") + 1).split(",");
                 
                 for (let itemName of itemsToRemove) {
@@ -405,7 +405,7 @@ class EggCart {
             const messageText = ctx.update.message.text;
             const chatType = ctx.update.message.chat.type;
             
-            if (messageText.includes(`@${this.botName}`) || chatType === 'private' || chatType === 'group') {
+            if (messageText.includes(`@${this.botName}`) || chatType === 'private' || chatType === 'group' || chatType === 'supergroup') {
                 await this.performGetList(ctx, ctx.chat.id);
             }
         });
@@ -470,7 +470,7 @@ class EggCart {
             const messageText = ctx.update.message.text;
             const chatType = ctx.update.message.chat.type;
             
-            if (messageText.includes(`@${this.botName}`) || chatType === 'private' || chatType === 'group') {
+            if (messageText.includes(`@${this.botName}`) || chatType === 'private' || chatType === 'group' || chatType === 'supergroup') {
                 await this.performClearList(ctx, ctx.chat.id);
             }
         });
@@ -528,7 +528,7 @@ class EggCart {
             const messageText = ctx.update.message.text;
             const chatType = ctx.update.message.chat.type;
             
-            if (messageText.includes(`@${this.botName}`) || chatType === 'private' || chatType === 'group') {
+            if (messageText.includes(`@${this.botName}`) || chatType === 'private' || chatType === 'group' || chatType === 'supergroup') {
                 ctx.reply(text.help.help.es);
             }
         });
@@ -542,7 +542,9 @@ class EggCart {
             const messageText = ctx.update.message.text;
             const chatType = ctx.update.message.chat.type;
             
-            if (messageText.includes(`@${this.botName}`) || chatType === 'private' || chatType === 'group') {
+            console.log(chatType)
+            
+            if (messageText.includes(`@${this.botName}`) || chatType === 'private' || chatType === 'group' || chatType === 'supergroup') {
                 ctx.reply(text.help.help.es);
             }
         });
