@@ -2,6 +2,7 @@ const path = require('path');
 const { Telegraf, Markup } = require('telegraf')
 
 const config = require(path.join(__dirname, '..', 'config'));
+const text = require(path.join(__dirname, '..', 'config', 'language'));
 const EggoListController = require(path.join(__dirname, '..', 'controllers', 'eggolist.js'));
 const ChatListController = require(path.join(__dirname, '..', 'controllers', 'chatlist.js'));
 
@@ -128,13 +129,13 @@ class EggCart {
                 const newKeyboard = generateInlineKeyboard(items, chatId, prevPageIndex);
                 
                 await ctx.deleteMessage();
-                await ctx.reply(config.text.handlerPrevPage.delete.es, {
+                await ctx.reply(text.handlerPrevPage.delete.es, {
                     reply_markup: newKeyboard.reply_markup
                 });
                 
             } catch (error) {
                 console.error("Error en prev_page:", error);
-                await ctx.reply(config.text.handlerPrevPage.err.es);
+                await ctx.reply(text.handlerPrevPage.err.es);
             }
         });
         
@@ -153,12 +154,12 @@ class EggCart {
                     await this.performDeleteItem(chatId, item.item)(ctx);
                     
                 } else {
-                    await ctx.reply(config.text.handlerDelete.notFound.es);
+                    await ctx.reply(text.handlerDelete.notFound.es);
                 }
                 
             } catch (error) {
                 console.error("Error en delete_item:", error);
-                await ctx.reply(config.text.handlerDelete.err.es);
+                await ctx.reply(text.handlerDelete.err.es);
             }
         });
         
@@ -180,13 +181,13 @@ class EggCart {
                 const newKeyboard = generateInlineKeyboard(items, chatId, nextPageIndex);
                 
                 await ctx.deleteMessage();
-                await ctx.reply(config.text.handlerNextPage.delete.es, {
+                await ctx.reply(text.handlerNextPage.delete.es, {
                     reply_markup: newKeyboard.reply_markup
                 });
                 
             } catch (error) {
                 console.error("Error en next_page:", error);
-                await ctx.reply(config.text.handlerNextPage.err.es);
+                await ctx.reply(text.handlerNextPage.err.es);
             }
         });
         
@@ -203,7 +204,7 @@ class EggCart {
                 
             } catch (error) {
                 console.error("Error en go_back:", error);
-                await ctx.reply(config.text.handlerGoBack.err.es);
+                await ctx.reply(text.handlerGoBack.err.es);
             }
         });
         
@@ -223,11 +224,11 @@ class EggCart {
                 
                 const keyboard = generateInlineKeyboard(items, chatId, currentPage);
                 
-                await ctx.reply(config.text.handlerCheckItem.delete.es, keyboard);
+                await ctx.reply(text.handlerCheckItem.delete.es, keyboard);
                 
             } catch (error) {
                 console.error("Error en check_item:", error);
-                await ctx.reply(config.text.handlerCheckItem.err.es);
+                await ctx.reply(text.handlerCheckItem.err.es);
             }
         });
         
@@ -267,7 +268,7 @@ class EggCart {
                 const cancelButton = Markup.button.callback('❌', `cancel_clear_${chatId}`);
                 const confirmationKeyboard = Markup.inlineKeyboard([confirmButton, cancelButton]);
                 
-                ctx.reply(config.text.handlerClear.delete.es, confirmationKeyboard);
+                ctx.reply(text.handlerClear.delete.es, confirmationKeyboard);
                 
             } catch (error) {
                 console.error("Error in clear command:", error);
@@ -309,14 +310,14 @@ class EggCart {
      * Add an item to the shopping list via the bot command.
      */
     addItem() {
-        this.bot.command('add', async (ctx) => {
+        this.bot.command(text.command.add.es, async (ctx) => {
             const chatId = ctx.chat.id;
             const messageText = ctx.update.message.text;
             const chatType = ctx.update.message.chat.type;
             
             if (messageText.includes(`@${this.botName}`) || chatType === 'private' || chatType === 'group') {
                 let itemsToAdd = messageText.slice(messageText.indexOf(" ") + 1).split(",");
-                let response = config.text.methodAddItem.ok.es;
+                let response = text.methodAddItem.ok.es;
                 
                 for (let itemText of itemsToAdd) {
                     try {
@@ -330,7 +331,7 @@ class EggCart {
                     }
                 }
                 
-                response = response.slice(0, -2) + config.text.methodAddItem.added.es;
+                response = response.slice(0, -2) + text.methodAddItem.added.es;
                 ctx.replyWithMarkdownV2(response);
             }
         });
@@ -340,7 +341,7 @@ class EggCart {
      * Remove an item from the shopping list via the bot command.
      */
     deleteItem() {
-        this.bot.command('remove', async (ctx) => {
+        this.bot.command(text.command.remove.es, async (ctx) => {
             const chatId = ctx.chat.id;
             const messageText = ctx.update.message.text;
             const chatType = ctx.update.message.chat.type;
@@ -377,19 +378,19 @@ class EggCart {
                     
                     if (item) {
                         await this.listController.removeItem(item.id);
-                        response = `${config.text.methodPerformDelete.ok.es} *${escapeMarkdownV2Characters(itemName)}* ${config.text.methodPerformDelete.removed.es}\\.`;
+                        response = `${text.methodPerformDelete.ok.es} *${escapeMarkdownV2Characters(itemName)}* ${text.methodPerformDelete.removed.es}\\.`;
                         
                     } else {
-                        response = `${config.text.methodPerformDelete.oh.es} *${escapeMarkdownV2Characters(itemName)}* ${config.text.methodPerformDelete.notFound.es}`;
+                        response = `${text.methodPerformDelete.oh.es} *${escapeMarkdownV2Characters(itemName)}* ${text.methodPerformDelete.notFound.es}`;
                     }
                     
                 } else {
-                    response = `${config.text.methodPerformDelete.oh.es} ${config.text.methodPerformDelete.noList.es}`;
+                    response = `${text.methodPerformDelete.oh.es} ${text.methodPerformDelete.noList.es}`;
                 }
                 
             } catch (error) {
                 console.error(error);
-                response = `${config.text.methodPerformDelete.oh.es} ${config.text.methodPerformDelete.errP1.es} *${escapeMarkdownV2Characters(itemName)}* ${config.text.methodPerformDelete.errP2.es}`;
+                response = `${text.methodPerformDelete.oh.es} ${text.methodPerformDelete.errP1.es} *${escapeMarkdownV2Characters(itemName)}* ${text.methodPerformDelete.errP2.es}`;
             }
             
             ctx.replyWithMarkdownV2(response);
@@ -400,7 +401,7 @@ class EggCart {
      * Retrieve the shopping list via the bot command.
      */
     getList() {
-        this.bot.command('list', async (ctx) => {
+        this.bot.command(text.command.showList.es, async (ctx) => {
             const messageText = ctx.update.message.text;
             const chatType = ctx.update.message.chat.type;
             
@@ -432,10 +433,10 @@ class EggCart {
                 
                 let items = await this.listController.getItems(chatList.id);
                 
-                response = '*Grocery List*\n';
+                response = `*${text.methodPerformGetList.groceryList.es}*\n`;
                 
                 if (items.length === 0) {
-                    response += "Nothing to shop for\\. \nTry adding eggs\\.";
+                    response += `${text.methodPerformGetList.emptyList.es}`;
                     
                 } else {
                     items.forEach((item, index) => {
@@ -447,19 +448,17 @@ class EggCart {
                         Markup.button.callback('✔️', `ok_${chatId}`),
                         Markup.button.callback('🔥', `clear_${chatId}`)
                     ]);
-                    
-                    response += "\nSelect an option:";
                 }
                 
             } else {
-                response = "No shopping list found for this chat\\. \nStart by adding some items\\.";
+                response = `${text.methodPerformGetList.notFound.es}`;
             }
             
             ctx.replyWithMarkdownV2(response, keyboard);
             
         } catch (error) {
             console.error('Error performing get list:', error);
-            ctx.replyWithMarkdownV2("An error occurred while getting the list\\.");
+            ctx.replyWithMarkdownV2(text.methodPerformGetList.err.es);
         }
     }
     
@@ -467,7 +466,7 @@ class EggCart {
      * Clear the shopping list via the bot command.
      */
     clearList() {
-        this.bot.command('clear', async (ctx) => {
+        this.bot.command(text.command.clear.es, async (ctx) => {
             const messageText = ctx.update.message.text;
             const chatType = ctx.update.message.chat.type;
             
@@ -492,15 +491,15 @@ class EggCart {
             
             if (chatList) {
                 await this.listController.clearItems(chatList.id);
-                ctx.replyWithMarkdownV2(config.text.methodPerformClear.cleared.es);
+                ctx.replyWithMarkdownV2(text.methodPerformClear.cleared.es);
                 
             } else {
-                ctx.replyWithMarkdownV2(config.text.methodPerformClear.notFound.es);
+                ctx.replyWithMarkdownV2(text.methodPerformClear.notFound.es);
             }
             
         } catch (error) {
             console.error(error);
-            ctx.replyWithMarkdownV2(config.text.methodPerformClear.err.es);
+            ctx.replyWithMarkdownV2(text.methodPerformClear.err.es);
         }
     }
     
@@ -530,7 +529,7 @@ class EggCart {
             const chatType = ctx.update.message.chat.type;
             
             if (messageText.includes(`@${this.botName}`) || chatType === 'private' || chatType === 'group') {
-                ctx.reply(config.text.help.help.es);
+                ctx.reply(text.help.help.es);
             }
         });
     }
@@ -544,7 +543,7 @@ class EggCart {
             const chatType = ctx.update.message.chat.type;
             
             if (messageText.includes(`@${this.botName}`) || chatType === 'private' || chatType === 'group') {
-                ctx.reply(config.text.help.help.es);
+                ctx.reply(text.help.help.es);
             }
         });
     }

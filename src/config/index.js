@@ -31,7 +31,7 @@ const generalConfig = {
     test: bot.test,
     production: bot.production
   },
-  text: text.en
+  text: text
 };
 
 /**

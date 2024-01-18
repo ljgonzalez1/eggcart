@@ -90,6 +90,26 @@ const text = {
       es: "de la lista de compras\\."
     }
   },
+  methodPerformGetList: {
+    groceryList: {
+      en: "Grocery List",
+      es: "Lista de compras"
+    },
+    emptyList: {
+      en: "Nothing to shop for\\. \nTry adding eggs\\.",
+      es: "La lista está vacía\\. \n Intenta añadir huevos\\."
+    },
+    notFound: {
+      en: "No shopping list found for this chat\\. \nStart by adding some items\\.",
+      es: "No se ha encontrado una lista de compras para este chat\\. \nIntenta añadir ítems para crear una\\."
+    },
+    err: {
+      en: "An error occurred while getting the list\\.",
+      es: "Ha ocurrido un error intentando obtener la lista de compras\\."
+    }
+    
+    
+  },
   methodPerformClear: {
     cleared: {
       en: "The shopping list has been cleared\\.",
@@ -116,6 +136,24 @@ const text = {
         "Mostrar la lista: /lista\n" +
         "Eliminar la lista: /limpiar\n" +
         "Este menú: /help"
+    }
+  },
+  command: {
+    add: {
+      en: "add",
+      es: "agregar"
+    },
+    remove: {
+      en: "remove",
+      es: "quitar"
+    },
+    showList: {
+      en: "list",
+      es: "lista"
+    },
+    clear: {
+      en: "clear",
+      es: "limpiar"
     }
   }
 }
