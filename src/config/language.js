@@ -56,7 +56,7 @@ const text = {
       en: "Okay\\! \n"
     },
     added: {
-      es: " ahora está(n) en la lista de compras\\.",
+      es: " ahora está\\(n\\) en la lista de compras\\.",
       en: " is \\(are\\) now on the shopping list\\."
     }
   },

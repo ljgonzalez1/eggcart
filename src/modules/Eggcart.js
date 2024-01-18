@@ -309,7 +309,7 @@ class EggCart {
     /**
      * Add an item to the shopping list via the bot command.
      */
-    addItem() {
+    addItemEs() {
         this.bot.command(text.command.add.es, async (ctx) => {
             const chatId = ctx.chat.id;
             const messageText = ctx.update.message.text;
@@ -331,6 +331,37 @@ class EggCart {
                     }
                 }
                 
+                console.log(response);
+                
+                response = response.slice(0, -2) + text.methodAddItem.added.es;
+                ctx.replyWithMarkdownV2(response);
+            }
+        });
+    }
+    addItemEn() {
+        this.bot.command(text.command.add.en, async (ctx) => {
+            const chatId = ctx.chat.id;
+            const messageText = ctx.update.message.text;
+            const chatType = ctx.update.message.chat.type;
+            
+            if (messageText.includes(`@${this.botName}`) || chatType === 'private' || chatType === 'group' || chatType === 'supergroup') {
+                let itemsToAdd = messageText.slice(messageText.indexOf(" ") + 1).split(",");
+                let response = text.methodAddItem.ok.es;
+                
+                for (let itemText of itemsToAdd) {
+                    try {
+                        const chatList = await this.chatListController.findOrCreateChatList(chatId);
+                        await this.listController.addItem(chatList.id, beautifyText(itemText.trim()));
+                        
+                        response += `*${escapeMarkdownV2Characters(beautifyText(itemText.trim()))}*, `;
+                        
+                    } catch (error) {
+                        console.error(error);
+                    }
+                }
+                
+                console.log(response);
+                
                 response = response.slice(0, -2) + text.methodAddItem.added.es;
                 ctx.replyWithMarkdownV2(response);
             }
@@ -340,8 +371,23 @@ class EggCart {
     /**
      * Remove an item from the shopping list via the bot command.
      */
-    deleteItem() {
+    deleteItemEs() {
         this.bot.command(text.command.remove.es, async (ctx) => {
+            const chatId = ctx.chat.id;
+            const messageText = ctx.update.message.text;
+            const chatType = ctx.update.message.chat.type;
+            
+            if (messageText.includes(`@${this.botName}`) || chatType === 'private' || chatType === 'group' || chatType === 'supergroup') {
+                let itemsToRemove = messageText.slice(messageText.indexOf(" ") + 1).split(",");
+                
+                for (let itemName of itemsToRemove) {
+                    await this.performDeleteItem(chatId, itemName.trim())(ctx);
+                }
+            }
+        });
+    }
+    deleteItemEn() {
+        this.bot.command(text.command.remove.en, async (ctx) => {
             const chatId = ctx.chat.id;
             const messageText = ctx.update.message.text;
             const chatType = ctx.update.message.chat.type;
@@ -400,8 +446,18 @@ class EggCart {
     /**
      * Retrieve the shopping list via the bot command.
      */
-    getList() {
+    getListEs() {
         this.bot.command(text.command.showList.es, async (ctx) => {
+            const messageText = ctx.update.message.text;
+            const chatType = ctx.update.message.chat.type;
+            
+            if (messageText.includes(`@${this.botName}`) || chatType === 'private' || chatType === 'group' || chatType === 'supergroup') {
+                await this.performGetList(ctx, ctx.chat.id);
+            }
+        });
+    }
+    getListEn() {
+        this.bot.command(text.command.showList.en, async (ctx) => {
             const messageText = ctx.update.message.text;
             const chatType = ctx.update.message.chat.type;
             
@@ -465,7 +521,19 @@ class EggCart {
     /**
      * Clear the shopping list via the bot command.
      */
-    clearList() {
+    clearListEn() {
+        this.bot.command(text.command.clear.en, async (ctx) => {
+            const messageText = ctx.update.message.text;
+            const chatType = ctx.update.message.chat.type;
+            
+            if (messageText.includes(`@${this.botName}`) || chatType === 'private' || chatType === 'group' || chatType === 'supergroup') {
+                await this.performClearList(ctx, ctx.chat.id);
+            }
+        });
+        
+        this.setupButtonHandlers();
+    }
+    clearListEs() {
         this.bot.command(text.command.clear.es, async (ctx) => {
             const messageText = ctx.update.message.text;
             const chatType = ctx.update.message.chat.type;
@@ -543,6 +611,16 @@ class EggCart {
             const chatType = ctx.update.message.chat.type;
             
             console.log(chatType)
+            
+            if (messageText.includes(`@${this.botName}`) || chatType === 'private' || chatType === 'group' || chatType === 'supergroup') {
+                ctx.reply(text.help.help.es);
+            }
+        });
+    }
+    helpEs() {
+        this.bot.command('ayuda', async (ctx) => {
+            const messageText = ctx.update.message.text;
+            const chatType = ctx.update.message.chat.type;
             
             if (messageText.includes(`@${this.botName}`) || chatType === 'private' || chatType === 'group' || chatType === 'supergroup') {
                 ctx.reply(text.help.help.es);
