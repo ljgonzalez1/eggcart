@@ -1,6 +1,6 @@
 FROM node:18
 
-RUN npm install --global yarn
+#RUN npm install --global yarn
 
 WORKDIR /app
 
