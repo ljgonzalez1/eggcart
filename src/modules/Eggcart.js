@@ -316,7 +316,7 @@ class EggCart {
             
             if (messageText.includes(`@${this.botName}`) || chatType === 'private' || chatType === 'group' || chatType === 'supergroup') {
                 let itemsToAdd = messageText.slice(messageText.indexOf(" ") + 1).split(",");
-                let response = '\\¡Okay\\! \n';
+                let response = '¡Okay\\! \n';
                 
                 for (let itemText of itemsToAdd) {
                     try {
@@ -344,7 +344,7 @@ class EggCart {
             
             if (messageText.includes(`@${this.botName}`) || chatType === 'private' || chatType === 'group' || chatType === 'supergroup') {
                 let itemsToAdd = messageText.slice(messageText.indexOf(" ") + 1).split(",");
-                let response = '\\¡Okay\\! \n';
+                let response = '¡Okay\\! \n';
                 
                 for (let itemText of itemsToAdd) {
                     try {
@@ -421,19 +421,19 @@ class EggCart {
                     
                     if (item) {
                         await this.listController.removeItem(item.id);
-                        response = `\\¡Okey\\! \n*${escapeMarkdownV2Characters(itemName)}* Se ha eliminado de la lista de pendientes\\.`;
+                        response = `¡Okey\\! \n*${escapeMarkdownV2Characters(itemName)}* Se ha eliminado de la lista de pendientes\\.`;
                         
                     } else {
-                        response = `\\¡Oh\\! \n*${escapeMarkdownV2Characters(itemName)}* El pendiente no se ha encontrado en la lista\\.`;
+                        response = `¡Oh\\! \n*${escapeMarkdownV2Characters(itemName)}* El pendiente no se ha encontrado en la lista\\.`;
                     }
                     
                 } else {
-                    response = `\\¡Oh\\! \nNo se ha encontrado una lista de pendientes en este chat\\.`;
+                    response = `¡Oh\\! \nNo se ha encontrado una lista de pendientes en este chat\\.`;
                 }
                 
             } catch (error) {
                 console.error(error);
-                response = `\\¡Oh\\! \nError al eliminar *${escapeMarkdownV2Characters(itemName)}* de la lista de pendientes\\.`;
+                response = `¡Oh\\! \nError al eliminar *${escapeMarkdownV2Characters(itemName)}* de la lista de pendientes\\.`;
             }
             
             ctx.replyWithMarkdownV2(response);
