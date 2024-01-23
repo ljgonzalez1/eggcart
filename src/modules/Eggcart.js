@@ -52,15 +52,15 @@ function generateInlineKeyboard(items, chatId, currentPage = 0) {
     let paginated = false;
     let buttons;
     
-    if (itemCount < 9) {
-        columns = [0, 1, 2, 4, 5].includes(itemCount) ? 2 : 3;
+    if (itemCount < 6) {
+        columns = 1;
         
     } else {
-        columns = 3;
+        columns = 2;
         paginated = true;
     }
     
-    const itemsPerPage = 9;
+    const itemsPerPage = 6;
     
     if (paginated) {
         const pageStart = currentPage * itemsPerPage;
@@ -128,13 +128,13 @@ class EggCart {
                 const newKeyboard = generateInlineKeyboard(items, chatId, prevPageIndex);
                 
                 await ctx.deleteMessage();
-                await ctx.reply("Which one do you want to delete?", {
+                await ctx.reply("¿Cuál quieres eliminar?", {
                     reply_markup: newKeyboard.reply_markup
                 });
                 
             } catch (error) {
                 console.error("Error en prev_page:", error);
-                await ctx.reply("An error occurred while trying to go to the previous page.");
+                await ctx.reply("Ha ocurrido un error cargando a la página anterior.");
             }
         });
         
@@ -153,12 +153,12 @@ class EggCart {
                     await this.performDeleteItem(chatId, item.item)(ctx);
                     
                 } else {
-                    await ctx.reply("Item not found.");
+                    await ctx.reply("Pendiente no encontrado.");
                 }
                 
             } catch (error) {
                 console.error("Error en delete_item:", error);
-                await ctx.reply("An error occurred while trying to delete the item.");
+                await ctx.reply("Ha ocurrido un error eliminando el pendiente.");
             }
         });
         
@@ -180,13 +180,13 @@ class EggCart {
                 const newKeyboard = generateInlineKeyboard(items, chatId, nextPageIndex);
                 
                 await ctx.deleteMessage();
-                await ctx.reply("Which one do you want to delete?", {
+                await ctx.reply("¿Cuál quieres eliminar?", {
                     reply_markup: newKeyboard.reply_markup
                 });
                 
             } catch (error) {
                 console.error("Error en next_page:", error);
-                await ctx.reply("An error occurred while trying to go to the next page.");
+                await ctx.reply("Ha ocurrido un error cambiando a la siguiente página");
             }
         });
         
@@ -203,7 +203,7 @@ class EggCart {
                 
             } catch (error) {
                 console.error("Error en go_back:", error);
-                await ctx.reply("An error occurred while trying to go back.");
+                await ctx.reply("Ha ocurrido un error al volver");
             }
         });
         
@@ -223,11 +223,11 @@ class EggCart {
                 
                 const keyboard = generateInlineKeyboard(items, chatId, currentPage);
                 
-                await ctx.reply("Which one do you want to delete?", keyboard);
+                await ctx.reply("¿Cuál quieres eliminar?", keyboard);
                 
             } catch (error) {
                 console.error("Error en check_item:", error);
-                await ctx.reply("An error occurred.");
+                await ctx.reply("Ha ocurrido un error");
             }
         });
         
@@ -267,7 +267,7 @@ class EggCart {
                 const cancelButton = Markup.button.callback('❌', `cancel_clear_${chatId}`);
                 const confirmationKeyboard = Markup.inlineKeyboard([confirmButton, cancelButton]);
                 
-                ctx.reply("Are you sure you want to delete the whole list?", confirmationKeyboard);
+                ctx.reply("¿Estás seguro(a) de que quieres eliminar la lista completa?", confirmationKeyboard);
                 
             } catch (error) {
                 console.error("Error in clear command:", error);
@@ -314,9 +314,9 @@ class EggCart {
             const messageText = ctx.update.message.text;
             const chatType = ctx.update.message.chat.type;
             
-            if (messageText.includes(`@${this.botName}`) || chatType === 'private' || chatType === 'group') {
+            if (messageText.includes(`@${this.botName}`) || chatType === 'private' || chatType === 'group' || chatType === 'supergroup') {
                 let itemsToAdd = messageText.slice(messageText.indexOf(" ") + 1).split(",");
-                let response = 'Okay\\! \n';
+                let response = '\\¡Okay\\! \n';
                 
                 for (let itemText of itemsToAdd) {
                     try {
@@ -330,7 +330,35 @@ class EggCart {
                     }
                 }
                 
-                response = response.slice(0, -2) + ' is \\(are\\) now on the shopping list\\.';
+                response = response.slice(0, -2) + ' ahora está\\(n\\) en la lista de pendientes\\.';
+                ctx.replyWithMarkdownV2(response);
+            }
+        });
+    }
+    
+    agregar() {
+        this.bot.command('agregar', async (ctx) => {
+            const chatId = ctx.chat.id;
+            const messageText = ctx.update.message.text;
+            const chatType = ctx.update.message.chat.type;
+            
+            if (messageText.includes(`@${this.botName}`) || chatType === 'private' || chatType === 'group' || chatType === 'supergroup') {
+                let itemsToAdd = messageText.slice(messageText.indexOf(" ") + 1).split(",");
+                let response = '\\¡Okay\\! \n';
+                
+                for (let itemText of itemsToAdd) {
+                    try {
+                        const chatList = await this.chatListController.findOrCreateChatList(chatId);
+                        await this.listController.addItem(chatList.id, beautifyText(itemText.trim()));
+                        
+                        response += `*${escapeMarkdownV2Characters(beautifyText(itemText.trim()))}*, `;
+                        
+                    } catch (error) {
+                        console.error(error);
+                    }
+                }
+                
+                response = response.slice(0, -2) + ' ahora está\\(n\\) en la lista de pendientes\\.';
                 ctx.replyWithMarkdownV2(response);
             }
         });
@@ -345,7 +373,23 @@ class EggCart {
             const messageText = ctx.update.message.text;
             const chatType = ctx.update.message.chat.type;
             
-            if (messageText.includes(`@${this.botName}`) || chatType === 'private' || chatType === 'group') {
+            if (messageText.includes(`@${this.botName}`) || chatType === 'private' || chatType === 'group' || chatType === 'supergroup') {
+                let itemsToRemove = messageText.slice(messageText.indexOf(" ") + 1).split(",");
+                
+                for (let itemName of itemsToRemove) {
+                    await this.performDeleteItem(chatId, itemName.trim())(ctx);
+                }
+            }
+        });
+    }
+    
+    quitar() {
+        this.bot.command('quitar', async (ctx) => {
+            const chatId = ctx.chat.id;
+            const messageText = ctx.update.message.text;
+            const chatType = ctx.update.message.chat.type;
+            
+            if (messageText.includes(`@${this.botName}`) || chatType === 'private' || chatType === 'group' || chatType === 'supergroup') {
                 let itemsToRemove = messageText.slice(messageText.indexOf(" ") + 1).split(",");
                 
                 for (let itemName of itemsToRemove) {
@@ -377,19 +421,19 @@ class EggCart {
                     
                     if (item) {
                         await this.listController.removeItem(item.id);
-                        response = `Okay\\! *${escapeMarkdownV2Characters(itemName)}* removed from the shopping list\\.`;
+                        response = `\\¡Okey\\! \n*${escapeMarkdownV2Characters(itemName)}* Se ha eliminado de la lista de pendientes\\.`;
                         
                     } else {
-                        response = `Oh\\! *${escapeMarkdownV2Characters(itemName)}* not found in the shopping list\\.`;
+                        response = `\\¡Oh\\! \n*${escapeMarkdownV2Characters(itemName)}* El pendiente no se ha encontrado en la lista\\.`;
                     }
                     
                 } else {
-                    response = `Oh\\! Shopping list not found for this chat\\.`;
+                    response = `\\¡Oh\\! \nNo se ha encontrado una lista de pendientes en este chat\\.`;
                 }
                 
             } catch (error) {
                 console.error(error);
-                response = `Oh\\! Error removing *${escapeMarkdownV2Characters(itemName)}* from the shopping list\\.`;
+                response = `\\¡Oh\\! \nError al eliminar *${escapeMarkdownV2Characters(itemName)}* de la lista de pendientes\\.`;
             }
             
             ctx.replyWithMarkdownV2(response);
@@ -404,7 +448,18 @@ class EggCart {
             const messageText = ctx.update.message.text;
             const chatType = ctx.update.message.chat.type;
             
-            if (messageText.includes(`@${this.botName}`) || chatType === 'private' || chatType === 'group') {
+            if (messageText.includes(`@${this.botName}`) || chatType === 'private' || chatType === 'group' || chatType === 'supergroup') {
+                await this.performGetList(ctx, ctx.chat.id);
+            }
+        });
+    }
+    
+    lista() {
+        this.bot.command('lista', async (ctx) => {
+            const messageText = ctx.update.message.text;
+            const chatType = ctx.update.message.chat.type;
+            
+            if (messageText.includes(`@${this.botName}`) || chatType === 'private' || chatType === 'group' || chatType === 'supergroup') {
                 await this.performGetList(ctx, ctx.chat.id);
             }
         });
@@ -432,10 +487,10 @@ class EggCart {
                 
                 let items = await this.listController.getItems(chatList.id);
                 
-                response = '*Grocery List*\n';
+                response = '*Lista de pendientes*\n';
                 
                 if (items.length === 0) {
-                    response += "Nothing to shop for\\. \nTry adding eggs\\.";
+                    response += "No hay nada en la lista\\. \nIntenta añadir *Sacar la basura*\\.";
                     
                 } else {
                     items.forEach((item, index) => {
@@ -447,19 +502,17 @@ class EggCart {
                         Markup.button.callback('✔️', `ok_${chatId}`),
                         Markup.button.callback('🔥', `clear_${chatId}`)
                     ]);
-                    
-                    response += "\nSelect an option:";
                 }
                 
             } else {
-                response = "No shopping list found for this chat\\. \nStart by adding some items\\.";
+                response = "No se encontró una lista de pendientes en este chat\\. \nComienza por agregar pendientes\\.";
             }
             
             ctx.replyWithMarkdownV2(response, keyboard);
             
         } catch (error) {
             console.error('Error performing get list:', error);
-            ctx.replyWithMarkdownV2("An error occurred while getting the list\\.");
+            ctx.replyWithMarkdownV2("Ha ocurrido un error obteniendo la lista de pendientes\\.");
         }
     }
     
@@ -471,7 +524,20 @@ class EggCart {
             const messageText = ctx.update.message.text;
             const chatType = ctx.update.message.chat.type;
             
-            if (messageText.includes(`@${this.botName}`) || chatType === 'private' || chatType === 'group') {
+            if (messageText.includes(`@${this.botName}`) || chatType === 'private' || chatType === 'group' || chatType === 'supergroup') {
+                await this.performClearList(ctx, ctx.chat.id);
+            }
+        });
+        
+        this.setupButtonHandlers();
+    }
+    
+    limpiar() {
+        this.bot.command('limpiar', async (ctx) => {
+            const messageText = ctx.update.message.text;
+            const chatType = ctx.update.message.chat.type;
+            
+            if (messageText.includes(`@${this.botName}`) || chatType === 'private' || chatType === 'group' || chatType === 'supergroup') {
                 await this.performClearList(ctx, ctx.chat.id);
             }
         });
@@ -492,15 +558,15 @@ class EggCart {
             
             if (chatList) {
                 await this.listController.clearItems(chatList.id);
-                ctx.replyWithMarkdownV2("The shopping list has been cleared\\.");
+                ctx.replyWithMarkdownV2("La lista de pendientes ha sido borrada\\.");
                 
             } else {
-                ctx.replyWithMarkdownV2("No shopping list found for this chat\\.");
+                ctx.replyWithMarkdownV2("No hay lista de pendientes en este chat\\.");
             }
             
         } catch (error) {
             console.error(error);
-            ctx.replyWithMarkdownV2("An error occurred while clearing the list\\.");
+            ctx.replyWithMarkdownV2("Ha ocurrido un error borrando la lista de pendientes.\\.");
         }
     }
     
@@ -529,13 +595,30 @@ class EggCart {
             const messageText = ctx.update.message.text;
             const chatType = ctx.update.message.chat.type;
             
-            if (messageText.includes(`@${this.botName}`) || chatType === 'private' || chatType === 'group') {
+            if (messageText.includes(`@${this.botName}`) || chatType === 'private' || chatType === 'group' || chatType === 'supergroup') {
                 ctx.reply(
-                  "Add an item: /add Eggs, Milk, Cream\n" +
-                  "Remove an item: /remove Eggs, Milk\n" +
-                  "Show the list: /list\n" +
-                  "Clear the list: /clear\n" +
-                  "This menu: /help"
+                  `Agregar un pendiente: /agregar@${this.botName} Pendinte 1, mi pendiente 2, un tercer pendiente\n` +
+                  `Eliminar un pendiente: /quitar@${this.botName} mi pendiente 2\n` +
+                  `Mostrar la lista: /lista@${this.botName}\n` +
+                  `Limpiar la lista: /limpiar@${this.botName}\n` +
+                  `Este menú: /ayuda@${this.botName}`
+                );
+            }
+        });
+    }
+    
+    ayuda() {
+        this.bot.command('ayuda', async (ctx) => {
+            const messageText = ctx.update.message.text;
+            const chatType = ctx.update.message.chat.type;
+            
+            if (messageText.includes(`@${this.botName}`) || chatType === 'private' || chatType === 'group' || chatType === 'supergroup') {
+                ctx.reply(
+                  `Agregar un pendiente: /agregar@${this.botName} Pendinte 1, mi pendiente 2, un tercer pendiente\n` +
+                  `Eliminar un pendiente: /quitar@${this.botName} mi pendiente 2\n` +
+                  `Mostrar la lista: /lista@${this.botName}\n` +
+                  `Limpiar la lista: /limpiar@${this.botName}\n` +
+                  `Este menú: /ayuda@${this.botName}`
                 );
             }
         });
@@ -549,12 +632,13 @@ class EggCart {
             const messageText = ctx.update.message.text;
             const chatType = ctx.update.message.chat.type;
             
-            if (messageText.includes(`@${this.botName}`) || chatType === 'private' || chatType === 'group') {
+            if (messageText.includes(`@${this.botName}`) || chatType === 'private' || chatType === 'group' || chatType === 'supergroup') {
                 ctx.reply(
-                  "Add an item: /add Eggs, Milk, Cream\n" +
-                  "Remove an item: /remove Eggs, Milk\n" +
-                  "Show the list: /list\n" +
-                  "Clear the list: /clear"
+                  `Agregar un pendiente: /agregar@${this.botName} Pendinte 1, mi pendiente 2, un tercer pendiente\n` +
+                  `Eliminar un pendiente: /quitar@${this.botName} mi pendiente 2\n` +
+                  `Mostrar la lista: /lista@${this.botName}\n` +
+                  `Limpiar la lista: /limpiar@${this.botName}\n` +
+                  `Este menú: /ayuda@${this.botName}`
                 );
             }
         });
